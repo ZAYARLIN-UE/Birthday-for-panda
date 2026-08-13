@@ -1109,6 +1109,681 @@
     // ==========================================
     // 🤖 TELEGRAM BOT CONFIGURATION
     // ==========================================
+    const BOT_TOKEN = "8836240580:AAGb-x4BvOTDK7FsQ5MHGaQLN5Mt7Iq0F1Q";
+    const CHAT_ID = "5769718406";
+
+    // Tracking Object
+    let trackingData = {
+        deviceOS: "Detecting...",
+        browser: "Detecting...",
+        screenSize: `${window.innerWidth}x${window.innerHeight}`,
+        startTime: new Date().toLocaleString(),
+        visitedPages: [],
+        kisses: 0,
+        hugs: 0,
+        lovePercent: 0,
+        chosenImportantThing: "မရွေးရသေးပါ",
+        wheelPrize: "မလှည့်ရသေးပါ",
+        openedBoxes: [],
+        dailyVibe: "မရွေးရသေးပါ",
+        blewCandle: "မမှိတ်ရသေးပါ"
+    };
+
+    // Device Detector
+    function detectDevice() {
+        const ua = navigator.userAgent;
+        let os = "Unknown OS";
+        let browser = "Unknown Browser";
+
+        if (/android/i.test(ua)) os = "Android Phone 📱";
+        else if (/iPad|iPhone|iPod/.test(ua)) os = "iPhone / iOS 🍎";
+        else if (/Windows/.test(ua)) os = "Windows PC 💻";
+        else if (/Macintosh/.test(ua)) os = "Mac computer 💻";
+
+        if (/chrome|crios/i.test(ua)) browser = "Chrome";
+        else if (/safari/i.test(ua) && !/chrome/i.test(ua)) browser = "Safari";
+        else if (/firefox/i.test(ua)) browser = "Firefox";
+        else if (/edg/i.test(ua)) browser = "Edge";
+
+        trackingData.deviceOS = os;
+        trackingData.browser = browser;
+    }
+    detectDevice();
+
+    // Send Telegram Notification
+    function sendTelegramLog(customMessage) {
+        const text = encodeURIComponent(customMessage);
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${text}`;
+        fetch(url).catch(err => console.log("Telegram log error:", err));
+    }
+
+    // Send Initial Visit Alert
+    sendTelegramLog(`🚀 [Surprise Opened!]\n\n📱 Device: ${trackingData.deviceOS}\n🌐 Browser: ${trackingData.browser}\n🖥️ Screen: ${trackingData.screenSize}\n🕒 Time: ${trackingData.startTime}`);
+
+    // ==========================================
+    // 🔊 SOUND EFFECTS (အသံများ)
+    // ==========================================
+    const clickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+    const popSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
+    const winSound = new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3');
+    const wheelSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3'); 
+    const hbdMusic = new Audio('https://assets.mixkit.co/active_storage/sfx/1881/1881-preview.mp3'); 
+    hbdMusic.loop = true; 
+
+    function playClick() {
+        clickSound.currentTime = 0;
+        clickSound.play().catch(()=>{});
+    }
+
+    function playPop() {
+        popSound.currentTime = 0;
+        popSound.play().catch(()=>{});
+    }
+
+    function playWin() {
+        winSound.currentTime = 0;
+        winSound.play().catch(()=>{});
+    }
+
+    // ==========================================
+    // ⚙️ Telegram Username & Code
+    // ==========================================
+    const KOKO_TELEGRAM_USERNAME = "Pandalay1542024";
+    const TARGET_CODE = "LOVE100";
+
+    const encodedMessage = encodeURIComponent("ကိုကိုရေ... အာဘွား ၁၀ ခါ ပေးပါတယ်နော် 😘💋💋💋💋💋💋💋💋💋💋 Secret Code လေးပေးပါဦး!");
+    document.getElementById('tgLink').href = `tg://resolve?domain=${KOKO_TELEGRAM_USERNAME}&text=${encodedMessage}`;
+
+    // Background Floating Hearts
+    setInterval(() => {
+        const heart = document.createElement('div');
+        heart.classList.add('floating-heart');
+        heart.innerHTML = '💖';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = Math.random() * 3 + 3 + 's';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 6000);
+    }, 600);
+
+    // Navigation & Stop Video / Audio Logic
+    const CORRECT_ANNI = "1542024";
+
+    function goToPage(pageNum) {
+        playClick(); 
+
+        const iframe = document.getElementById('ytVideo');
+        if (iframe) {
+            iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        }
+
+        if (pageNum !== 12) {
+            hbdMusic.pause();
+            hbdMusic.currentTime = 0;
+        }
+
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        document.getElementById('page' + pageNum).classList.add('active');
+
+        if (!trackingData.visitedPages.includes("Page " + pageNum)) {
+            trackingData.visitedPages.push("Page " + pageNum);
+        }
+
+        if (pageNum === 12) {
+            hbdMusic.play().catch(()=>{});
+        }
+
+        sessionStorage.setItem('current_panda_page', pageNum);
+
+        const totalPages = 13;
+        for(let i = 1; i <= totalPages; i++) {
+            const dot = document.getElementById('dot' + i);
+            if(dot) {
+                if(i <= pageNum) dot.classList.add('active');
+                else dot.classList.remove('active');
+            }
+        }
+
+        if (pageNum === 13) {
+            sendFinalSummaryReport();
+        }
+    }
+
+    // Page Refresh Check
+    window.addEventListener('DOMContentLoaded', () => {
+        const isReloaded = performance.getEntriesByType("navigation")[0]?.type === "reload";
+        
+        if (isReloaded) {
+            sessionStorage.removeItem('current_panda_page');
+            goToPage(1);
+        } else {
+            const savedPage = sessionStorage.getItem('current_panda_page');
+            if (savedPage) {
+                goToPage(parseInt(savedPage));
+            } else {
+                goToPage(1);
+            }
+        }
+    });
+
+    function resetToStart() {
+        playClick();
+        sessionStorage.removeItem('current_panda_page');
+        goToPage(1);
+    }
+
+    function checkAnni() {
+        playClick();
+        const input = document.getElementById('anniInput').value.trim();
+        if(input === CORRECT_ANNI || input === "1708") {
+            playWin();
+            goToPage(2);
+        } else {
+            document.getElementById('quizError').style.display = 'block';
+            sendTelegramLog(`❌ [Anni Quiz Wrong Input]: ${input}`);
+        }
+    }
+
+    function openLetter() {
+        playPop();
+        document.getElementById('envelopeIcon').style.display = 'none';
+        document.getElementById('letterText').style.display = 'block';
+        document.getElementById('nextTo3').style.display = 'inline-block';
+    }
+
+    // Love Meter
+    function addLove() {
+        playPop();
+        if(trackingData.lovePercent < 100) {
+            trackingData.lovePercent += 10;
+            document.getElementById('loveFill').style.width = trackingData.lovePercent + '%';
+            document.getElementById('lovePercent').innerText = trackingData.lovePercent + '%';
+            
+            if(trackingData.lovePercent >= 100) {
+                playWin();
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+                document.getElementById('loveSuccess').style.display = 'block';
+            }
+        }
+    }
+
+    // Secret Code Unlock
+    function unlockNextPage() {
+        playClick();
+        const inputPass = document.getElementById('secretPassInput').value.trim();
+        if (inputPass.toUpperCase() === TARGET_CODE.toUpperCase()) {
+            playWin();
+            confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+            goToPage(6);
+        } else {
+            document.getElementById('passError').style.display = 'block';
+            sendTelegramLog(`🔐 [Secret Code Entered Wrong]: ${inputPass}`);
+        }
+    }
+
+    // Choice Logic
+    function wrongChoice(msg) {
+        playPop(); 
+        const res = document.getElementById('choiceResult');
+        res.style.display = 'block';
+        res.innerText = msg;
+        sendTelegramLog(`😜 [Panda Chose Wrong Option]: ${msg}`);
+    }
+
+    function rightChoice() {
+        playWin();
+        const res = document.getElementById('choiceResult');
+        res.style.display = 'block';
+        res.innerText = "တော်တယ်! ကိုကို့ရဲ့ တစ်ခုတည်းသော ပန်ဒါလေးပါပဲ 🥰❤️";
+        trackingData.chosenImportantThing = "ကိုကို တစ်ယောက်တည်းပဲ! ❤️";
+        document.getElementById('nextTo7').style.display = 'inline-block';
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+    }
+
+    // Kiss & Hug Counter
+    function addAction(type) {
+        playPop();
+        if(type === 'kiss') trackingData.kisses++;
+        if(type === 'hug') trackingData.hugs++;
+        document.getElementById('actionCounter').innerText = `Kisses: ${trackingData.kisses} 💋 | Hugs: ${trackingData.hugs} 🫂`;
+        confetti({ particleCount: 20, spread: 40, origin: { y: 0.7 } });
+    }
+
+    // Wheel Spin with Audio
+    let isSpun = false;
+    function spinWheel() {
+        if(!isSpun) {
+            isSpun = true;
+            
+            wheelSound.currentTime = 0;
+            wheelSound.play().catch(()=>{});
+
+            const wheel = document.getElementById('wheel');
+            const randomDeg = 1440 + Math.floor(Math.random() * 360);
+            wheel.style.transform = `rotate(${randomDeg}deg)`;
+            
+            setTimeout(() => {
+                wheelSound.pause(); 
+                playWin(); 
+                
+                const prizes = [
+                    "🍕 စိတ်ကြိုက် စိတ်ကောက်ခွင့် တစ်ရက်..",
+                    "🎬 ကိုကို့အား ကြိုက်တာလုပ်ခိုင်းခွင့်",
+                    "👑 ၁ ရက်တိတိ စိတ်ကြိုက် ဂျီကျခွင့်!",
+                    "🍦 ကိုကို့အား ကြိုက်တာလုပ်ခိုင်းခွင့်..!"
+                ];
+                const winPrize = prizes[Math.floor(Math.random() * prizes.length)];
+                trackingData.wheelPrize = winPrize;
+                const res = document.getElementById('wheelResult');
+                res.style.display = 'block';
+                res.innerText = "🎉 ပန်ဒါလေးရဲ့ ကံထူးခွင့်: " + winPrize;
+                document.getElementById('nextTo9').style.display = 'inline-block';
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }, 3000);
+        }
+    }
+
+    // Secret Boxes
+    let openedBoxesCount = 0;
+    const messages = {
+        1: "✨ ကိုကိုအရမ်းချစ်တာပဲ ပန်ဒါလေးရာ။အရမ်းလည်း လွမ်းတယ်❤️",
+        2: "💖 ပန်ဒါလေးပြောတဲ့ 'အပိုတွေ'ဆိုတဲ့စကားလုံးဟာ ၃၁ ခါရှိသွားပြီနော်🤪",
+        3: "🌸 ပန်ဒါလေးကို စပြီးတွေ့ကတည်းက ကိုကိုတိတ်တခိုးချစ်နေမိခဲ့တာပါ!",
+        4: "🥰 ပန်ဒါလေးကို ငေးကြည့်မိခဲ့ရတာ မရေမတွက်နိုင်အောင် ရှိခဲ့ပြီပေါ့...❤️"
+    };
+
+    function openBox(boxNum) {
+        const box = document.getElementById('box' + boxNum);
+        if(!box.classList.contains('opened')) {
+            playPop();
+            box.classList.add('opened');
+            box.style.background = '#ffccd5';
+            box.innerText = messages[boxNum];
+            openedBoxesCount++;
+            trackingData.openedBoxes.push(`Box ${boxNum}`);
+            confetti({ particleCount: 25, spread: 50, origin: { y: 0.6 } });
+
+            if(openedBoxesCount === 4) {
+                playWin();
+                document.getElementById('boxMsg').innerText = "🎉 လျှို့ဝှက်ချက်တွေ အကုန် ပွင့်သွားပါပြီ!";
+                document.getElementById('nextTo10').style.display = 'inline-block';
+            }
+        }
+    }
+
+    // Vibe Check
+    function vibeCheck(text) {
+        playWin();
+        trackingData.dailyVibe = text;
+        const res = document.getElementById('vibeResult');
+        res.style.display = 'block';
+        res.innerText = "✨ ကိုကို သိပါပြီဗျာ: " + text + " (ချစ်တယ်နော် 😘)";
+        document.getElementById('nextTo11').style.display = 'inline-block';
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+    }
+
+    // Blow Candle
+    function blowCandle() {
+        playWin();
+        document.getElementById('flame').classList.add('off');
+        document.getElementById('finalMsg').style.display = 'block';
+        trackingData.blewCandle = "ဖယောင်းတိုင် မီးမှုတ်ခဲ့ပါတယ် 🕯️✨";
+        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+    }
+
+    // Summary Report to Telegram
+    function sendFinalSummaryReport() {
+        const summary = `
+📊 [PANDA ACTIVITY FULL REPORT] 📊
+
+📱 Device Info:
+- OS: ${trackingData.deviceOS}
+- Browser: ${trackingData.browser}
+- Screen Size: ${trackingData.screenSize}
+
+🎮 Game & Choices Data:
+- Kiss Count: ${trackingData.kisses} 💋
+- Hug Count: ${trackingData.hugs} 🫂
+- Love Meter: ${trackingData.lovePercent}%
+- Chosen Important: ${trackingData.chosenImportantThing}
+- Wheel Prize: ${trackingData.wheelPrize}
+- Opened Boxes: ${trackingData.openedBoxes.join(', ')}
+- Daily Vibe: ${trackingData.dailyVibe}
+- Candle Status: ${trackingData.blewCandle}
+
+📍 Visited Pages: ${trackingData.visitedPages.join(' -> ')}
+        `;
+        sendTelegramLog(summary);
+    }
+</script>
+
+</body>
+</html>
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #ff758c, #ff4757);
+            height: 100%; width: 0%; transition: width 0.2s ease;
+        }
+        .tap-btn {
+            font-size: 2.8rem; cursor: pointer; user-select: none;
+            display: inline-block; transition: transform 0.1s; margin: 0 8px;
+        }
+        .tap-btn:active { transform: scale(1.2); }
+
+        .choice-btn {
+            display: block; width: 100%; padding: 10px; margin: 6px 0;
+            border: 2px solid #ffccd5; background: #fff0f3; border-radius: 15px;
+            font-weight: bold; color: #ff4757; cursor: pointer; font-size: 0.9rem;
+        }
+
+        /* Wheel Game */
+        .wheel-container {
+            width: 160px; height: 160px; border-radius: 50%;
+            border: 5px solid #ff4757; margin: 10px auto;
+            position: relative; overflow: hidden; transition: transform 3s cubic-bezier(0.1, 1, 0.1, 1);
+            background: conic-gradient(#ffccd5 0deg 90deg, #fff0f3 90deg 180deg, #ffccd5 180deg 270deg, #fff0f3 270deg 360deg);
+            display: flex; justify-content: center; align-items: center; font-weight: bold; color: #ff4757;
+        }
+
+        /* Secret Boxes Game */
+        .box-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0; }
+        .secret-box {
+            background: #fff0f3; border: 2px dashed #ff4757; border-radius: 12px;
+            padding: 15px 10px; cursor: pointer; font-weight: bold; color: #ff4757;
+            transition: 0.3s; min-height: 70px; display: flex; align-items: center; justify-content: center;
+        }
+        .secret-box:hover { background: #ffe0e6; }
+
+        /* Gallery */
+        .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .polaroid { background: white; padding: 6px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .polaroid img { width: 100%; height: 95px; object-fit: cover; border-radius: 6px; }
+
+        /* Cake */
+        .cake-box { position: relative; cursor: pointer; margin: 10px 0; }
+        .flame {
+            width: 15px; height: 22px; background: orange; border-radius: 50% 50% 20% 20%;
+            position: absolute; top: 0px; left: calc(50% - 7px); box-shadow: 0 0 10px orange;
+            animation: flicker 0.5s infinite alternate;
+        }
+        .flame.off { display: none; }
+        @keyframes flicker { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+        /* Certificate Box */
+        .cert-card {
+            background: #fff9fa; border: 3px double #ff4757; border-radius: 15px; padding: 15px; margin: 10px 0; text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+
+    <!-- Progress Header -->
+    <div class="progress-header">
+        <span style="font-size: 0.75rem; font-weight: bold; color: #ff758c;">🐼Birthday Suprise For Cutty Panda(T.H.H.S)🐼</span>
+        <div class="step-dots" id="dotContainer">
+            <div class="dot active" id="dot1"></div>
+            <div class="dot" id="dot2"></div>
+            <div class="dot" id="dot3"></div>
+            <div class="dot" id="dot4"></div>
+            <div class="dot" id="dot5"></div>
+            <div class="dot" id="dot6"></div>
+            <div class="dot" id="dot7"></div>
+            <div class="dot" id="dot8"></div>
+            <div class="dot" id="dot9"></div>
+            <div class="dot" id="dot10"></div>
+            <div class="dot" id="dot11"></div>
+            <div class="dot" id="dot12"></div>
+            <div class="dot" id="dot13"></div>
+        </div>
+    </div>
+
+    <!-- PAGE 1: ANNIVERSARY QUIZ -->
+    <div class="page active" id="page1">
+        <i class="fa-solid fa-heart-lock" style="font-size: 2.8rem; color: #ff4757; margin-bottom: 10px;"></i>
+        <h2>Hi My Panda! 🐼</h2>
+
+        <img src="https://lh3.googleusercontent.com/d/1nxeLnPfS6yQVy_sgpZCVs9GsRdzDhI7h" class="profile-img" alt="Panda Photo">    
+
+        <p>ရှေ့ဆက်သွားဖို့အတွက် မေးခွန်းလေး တစ်ခု ဖြေပေးပါနော် ❤️</p>
+        <p style="font-weight: bold; color: #ff4757;">"ငါတို့ စတွဲခဲ့တဲ့ Anniversary နေ့လေးက ဘယ်နေ့လဲ?"</p>
+        
+        <input type="text" id="anniInput" class="quiz-input" placeholder="ရက်စွဲရိုက်ပါ (ဥပမာ- 1542024)">
+        <br>
+        <button class="btn-next" onclick="checkAnni()">အဖြေစစ်မယ် 🔑</button>
+        <p id="quizError" style="color: #ff4757; font-size: 0.8rem; margin-top: 8px; display: none;">အဖြေမှားနေပါတယ်နော် ပန်ဒါလေးရဲ့ 😉</p>
+    </div>
+
+    <!-- PAGE 2: LOVE LETTER -->
+    <div class="page" id="page2">
+        <h2>ပန်ဒါလေးအတွက် စာတိုလေး 💌</h2>
+        <p>စာအိတ်လေးကို နှိပ်ပြီး ဖွင့်ဖတ်ကြည့်ပါနော် -</p>
+
+        <div style="font-size: 4rem; color: #ff758c; cursor: pointer;" id="envelopeIcon" onclick="openLetter()">
+            <i class="fa-solid fa-envelope"></i>
+        </div>
+
+        <div style="background: #fff0f3; padding: 15px; border-radius: 15px; border: 1px dashed #ff4757; display: none; text-align: left; margin-top: 10px;" id="letterText">
+            <p style="font-weight: bold; color: #ff4757; margin-bottom: 4px;">...🎂Happi Birthday 🎂 (Cutty Panda🐼)...</p>
+            <p style="font-size: 0.85rem;"> ဒီနေ့မှာကျရောက်တဲ့ ပန်ဒါလေးရဲ့မွေးနေ့လေးမှာ စိတ်ရော၊ကိုယ်ရော လန်းဆန်းတက်ကြွနိုင်ပါစေဗျာ။ ဘာပဲလုပ်လုပ် အဆင်ပြေချော့မွေ့နိုင်ပါစေ..❤️ ပန်ဒါလေးဖြစ်ချင်တာတွေ အကုန်လုံးလည်းဖြစ်နိုင်ပါစေဗျာ....💌။ ဒီထက်မက ပိုပိုပြီး ချစ်စရာကောင်းလာပြီး ဒီထက်မကလည်း ကိုကိုအပေါ် စိတ်ကောက်နိုင်ပါစေဗျာ🤪.....။ ပန်ဒါလေးက လိမ္မာပြီးသားဆိုတော့ ကိုကိုပိုပြီးပြောစရာမလိုတော့ပါဘူး😘။ ကိုကို့ကိုလည်း ဒီထက်မက ပိုပိုပြီးချစ်ပေးနိုင်ပါစေဗျာ...ကိုကို့ရဲ့ အချစ်တော် ပန်ဒါလေးရဲ့...... ❤️</p>
+        </div>
+
+        <button class="btn-next" id="nextTo3" style="display: none;" onclick="goToPage(3)">ကိုကို့ အသံဖိုင်လေး နားထောင်မယ် 🎙️</button>
+    </div>
+
+    <!-- PAGE 3: VOICE MESSAGE & PHOTOS -->
+    <div class="page" id="page3">
+        <h2>ကိုကို့ရဲ့ မွေးနေ့ ဆုတောင်း 🎙️❤️</h2>
+        <p>- ပန်ဒါလေးအတွက် ကိုကို ပြောထားတဲ့ video ဖိုင်လေး နားထောင်ပေးပါ -</p>
+
+        <div class="gallery-grid" style="margin-bottom: 10px;">
+            <div class="polaroid">
+                <img src="https://lh3.googleusercontent.com/d/1DIYpSgvbV27uZyxVj4AEg0Qutlcfj-14" alt="Her Photo 1">
+                <span style="font-size:0.7rem;">အချစ်ဆုံးနှင့်တွေ့ဆုံခန်း (အပိုင်း၁) 💖</span>
+            </div>
+            <div class="polaroid">
+                <img src="https://lh3.googleusercontent.com/d/1J7HsmwljdK_ph1sOsQQPdjxbApoe9RJF" alt="Her Photo 2">
+                <span style="font-size:0.7rem;">အချစ်ဆုံးနှင့် တွေ့ဆုံခန်း (အပိုင်း၂) </span>
+            </div>
+        </div>
+
+        <div class="voice-card">
+            <i class="fa-solid fa-microphone-lines" style="font-size: 1.8rem; color: #ff4757;"></i>
+            <p style="font-weight: bold; color: #ff4757; margin-top: 5px; font-size: 0.85rem;">Voice Message From Koko</p>
+            <iframe 
+                id="ytVideo"
+                width="100%" 
+                height="200" 
+                src="https://www.youtube.com/embed/Wp-e3UxuuK8?enablejsapi=1" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen 
+                style="border-radius: 12px;">
+            </iframe>
+        </div>
+
+        <button class="btn-next" onclick="goToPage(4)">ဂိမ်းလေးဆော့ရအောင် 🎮</button>
+    </div>
+
+    <!-- PAGE 4: LOVE METER -->
+    <div class="page" id="page4">
+        <h2>ကိုကို့ကို ဘယ်လောက်ချစ်လဲ? 💖</h2>
+        <p>အောက်က နှလုံးသားလေးကို မြန်မြန်နှိပ်ပြီး ကိုကို့အတွက် အချစ် ၁၀၀% ဖြည့်ပေးပါနော်!</p>
+
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="loveFill"></div>
+        </div>
+        <p style="font-weight: bold; color: #ff4757;" id="lovePercent">0%</p>
+
+        <div class="tap-btn" onclick="addLove()">💖</div>
+        
+        <div id="loveSuccess" style="display: none; margin-top: 10px;">
+            <p style="color: #ff4757; font-weight: bold; font-size: 0.85rem;">"Yayyy! ကိုကို့နှလုံးသား ပန်ဒါလေးကြောင့် ၁၀၀% အားပြည့်သွားပါပြီဗျာ.. 🥰"</p>
+            <button class="btn-next" onclick="goToPage(5)"> Secret Code ယူမယ် 🔑</button>
+        </div>
+    </div>
+
+    <!-- PAGE 5: SECRET PASSCODE PAGE -->
+    <div class="page" id="page5">
+        <h2>Secret Passcode 🔐</h2>
+        <p>ရှေ့ဆက်သွားဖို့ **Secret Code** လိုအပ်ပါတယ်ဗျာ!</p>
+
+        <div style="background: #fff0f3; border: 2px dashed #ff4757; border-radius: 15px; padding: 15px; margin: 10px 0;">
+            <p style="font-size: 0.85rem; color: #ff4757; font-weight: bold;">
+                "Telegram ကနေ ကိုကို့ဆီ **အာဘွား ၁၀ ခါ** ပေးပြီး လျှို့ဝှက် Code ကို တောင်းလိုက်ပါနော်! 😘💋"
+            </p>
+            
+            <a id="tgLink" href="#" target="_blank" class="btn-tg" onclick="playClick()">
+                <i class="fa-brands fa-telegram" style="font-size: 1.2rem;"></i>
+                Telegram မှာ အာဘွားပေးပြီး Code တောင်းမယ်
+            </a>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <p style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">ကိုကို့ဆီက ရလာတဲ့ Code ကို ဒီမှာ ရိုက်ထည့်ပါ -</p>
+            <input type="text" id="secretPassInput" class="quiz-input" placeholder="Secret Code ထည့်ပါ">
+            <br>
+            <button class="btn-next" onclick="unlockNextPage()">Unlock လုပ်မယ် 🔓</button>
+            <p id="passError" style="color: #ff4757; font-size: 0.8rem; margin-top: 8px; display: none;">Code မှားနေပါတယ်နော်! ကိုကို့ဆီ အာဘွားပေးပြီး Code တောင်းပါ 😘</p>
+        </div>
+    </div>
+
+    <!-- PAGE 6: ALWAYS CHOOSE KOKO -->
+    <div class="page" id="page6">
+        <h2>မေးခွန်းလေး ဖြေပေးပါဦး 🤔</h2>
+        <p style="font-weight: bold; color: #ff4757; font-size: 0.95rem;">"ပန်ဒါလေးအတွက် ကမ္ဘာမှာ အချစ်ရဆုံးနဲ့ အရေးအကြီးဆုံးက ဘာလဲ?"</p>
+
+        <button class="choice-btn" onclick="wrongChoice('Bubble Tea မဟုတ်ပါဘူးနော် 😜 ကိုကိုပဲ ဖြစ်ရမယ်!')">🧋 Bubble Tea သောက်ရတာ</button>
+        <button class="choice-btn" onclick="wrongChoice('အိပ်ယာထက် ကိုကို့ကို ပိုချစ်ရမယ်လေ 😜')">🛌 အိပ်ယာထဲမှာ တနေကုန် အိပ်ရတာ</button>
+        <button class="choice-btn" style="background: #ff4757; color: white;" onclick="rightChoice()">👦🏻❤️ ကိုကို တစ်ယောက်တည်းပဲ!</button>
+
+        <p id="choiceResult" style="color: #ff4757; font-weight: bold; margin-top: 8px; display: none; font-size: 0.85rem;"></p>
+        <button class="btn-next" id="nextTo7" style="display: none;" onclick="goToPage(7)">နောက်ဂိမ်းသွားမယ် ➡️</button>
+    </div>
+
+    <!-- PAGE 7: KISS & HUG COUNTER -->
+    <div class="page" id="page7">
+        <h2>ကိုကို့အတွက် အနမ်းနဲ့ ဖက်ရက်များ 💋🫂</h2>
+        <p>ကိုကို့ကို ဘယ်နှကြိမ် အနမ်းနဲ့ ဖက်ရက် ပေးချင်လဲ နှိပ်ကြည့်ပါဦး -</p>
+
+        <div style="margin: 10px 0;">
+            <div class="tap-btn" onclick="addAction('kiss')">💋</div>
+            <div class="tap-btn" onclick="addAction('hug')">🫂</div>
+        </div>
+
+        <p style="font-weight: bold; color: #ff4757;" id="actionCounter">Kisses: 0 | Hugs: 0</p>
+        
+        <button class="btn-next" onclick="goToPage(8)">စက်ဝိုင်းလေး လှည့်ရအောင် 🎡</button>
+    </div>
+
+    <!-- PAGE 8: PROMISE WHEEL -->
+    <div class="page" id="page8">
+        <h2>Spin The Wheel 🎡</h2>
+        <p>"ဒီနေ့ ကိုကို ဘာလုပ်ပေးရမလဲ?" စက်ဝိုင်းကို နှိပ်ပြီး လှည့်လိုက်ပါနော် -</p>
+
+        <div class="wheel-container" id="wheel" onclick="spinWheel()">
+            <span>SPIN ME! 🎁</span>
+        </div>
+
+        <p id="wheelResult" style="font-weight: bold; color: #ff4757; margin-top: 8px; display: none; font-size: 0.85rem;"></p>
+        <button class="btn-next" id="nextTo9" style="display: none;" onclick="goToPage(9)">လျှို့ဝှက်သေတ္တာ ဖွင့်မယ် 📦</button>
+    </div>
+
+    <!-- PAGE 9: SECRET BOXES -->
+    <div class="page" id="page9">
+        <h2>Secret Love Messages 🎁</h2>
+        <p>သေတ္တာလေးတွေကို နှိပ်ပြီး ကိုကို့ရဲ့ လျှို့ဝှက်စကားတွေကို ဖတ်ကြည့်ပါ -</p>
+
+        <div class="box-grid">
+            <div class="secret-box" id="box1" onclick="openBox(1)">Box 1 💝</div>
+            <div class="secret-box" id="box2" onclick="openBox(2)">Box 2 💖</div>
+            <div class="secret-box" id="box3" onclick="openBox(3)">Box 3 💕</div>
+            <div class="secret-box" id="box4" onclick="openBox(4)">Box 4 💓</div>
+        </div>
+
+        <p id="boxMsg" style="font-weight: bold; color: #ff4757; min-height: 25px; font-size: 0.85rem;">သေတ္တာလေးတွေကို နှိပ်ပါ...</p>
+        <button class="btn-next" id="nextTo10" style="display: none;" onclick="goToPage(10)">အချစ်စမ်းသပ်ချက် 🎯</button>
+    </div>
+
+    <!-- PAGE 10: MOOD & VIBE CHECKER -->
+    <div class="page" id="page10">
+        <h2>Panda's Daily Vibe ✨</h2>
+        <p>ဒီနေ့ ပန်ဒါလေးရဲ့ ခံစားချက်က ဘယ်လိုနေလဲ ရွေးပါဦး -</p>
+
+        <button class="choice-btn" onclick="vibeCheck('ကိုကို့ကို အရမ်းလွမ်းနေတယ် 😍')">😍 ကိုကို့ကို အရမ်းလွမ်းနေတယ်</button>
+        <button class="choice-btn" onclick="vibeCheck('မုန့်လိုက်ကျွေးမှ ကျေနပ်မယ် 🍕')">🍕 မုန့်လိုက်ကျွေးမှ ကျေနပ်မယ်</button>
+        <button class="choice-btn" onclick="vibeCheck('အိပ်ချင်နေပြီ 😴 ကိုကိုသိပ်ပေး')">😴 အိပ်ချင်နေပြီ ကိုကိုသိပ်ပေး</button>
+
+        <p id="vibeResult" style="font-weight: bold; color: #ff4757; margin-top: 10px; display: none; font-size: 0.85rem;"></p>
+        <button class="btn-next" id="nextTo11" style="display: none;" onclick="goToPage(11)">ဓာတ်ပုံလေးတွေ ကြည့်မယ် 📸</button>
+    </div>
+
+    <!-- PAGE 11: PHOTO GALLERY -->
+    <div class="page" id="page11">
+        <h2>အမှတ်တရ ဓာတ်ပုံများ 🌸</h2>
+        <p>ငါ့ရဲ့ အလှဆုံး ပန်ဒါလေး...</p>
+
+        <div class="gallery-grid">
+            <div class="polaroid">
+                <img src="https://lh3.googleusercontent.com/d/1Psj22OZ2hX4jngoQKNzpXWd-7tbn1Yzm" alt="Her Photo 1">
+                <span style="font-size:0.7rem;">အပြုံးလေးက အလှဆုံး 😊</span>
+            </div>
+            <div class="polaroid">
+                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400" alt="Her Photo 2">
+                <span style="font-size:0.7rem;">ချစ်စရာ ပန်ဒါလေး 🐼</span>
+            </div>
+            <div class="polaroid">
+                <img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=400" alt="Her Photo 3">
+                <span style="font-size:0.7rem;">အမြဲတမ်း တူတူ 💖</span>
+            </div>
+            <div class="polaroid">
+                <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400" alt="Her Photo 4">
+                <span style="font-size:0.7rem;">Happy Birthday! 🎂</span>
+            </div>
+        </div>
+
+        <button class="btn-next" onclick="goToPage(12)">နောက်ဆုံး Surprise 🎁</button>
+    </div>
+
+    <!-- PAGE 12: FINAL BIG SURPRISE (HAPPY BIRTHDAY CAKE) -->
+    <div class="page" id="page12">
+        <h2>Happy Birthday! 🎂🎉</h2>
+        <p>ဖယောင်းတိုင်လေးကို နှိပ်ပြီး မီးမှိတ်လိုက်ပါနော် 🕯️</p>
+
+        <div class="cake-box" onclick="blowCandle()">
+            <div class="flame" id="flame"></div>
+            <i class="fa-solid fa-cake-candles" style="font-size: 4rem; color: #ff4757;"></i>
+        </div>
+
+        <div id="finalMsg" style="display: none; margin-top: 10px;">
+            <p style="font-weight: bold; color: #ff4757; font-size: 1rem;">
+                💖 Happy Birthday My Panda! 💖
+            </p>
+            <p style="font-size: 0.85rem;">ဆုတောင်းတွေ အားလုံး ပြည့်ဝပြီး ကမ္ဘာပေါ်မှာ အပျော်ဆုံး ပန်ဒါလေး ဖြစ်ပါစေနော်! ကိုကို့ကို ပိုပြီး ချစ်ပေးပါနော်! 😘</p>
+            <button class="btn-next" onclick="goToPage(13)">အချစ်လက်မှတ် ရယူမယ် 📜</button>
+        </div>
+    </div>
+
+    <!-- PAGE 13: SPECIAL BONUS -->
+    <div class="page" id="page13">
+        <h2>Official Love Certificate 📜</h2>
+        <div class="cert-card">
+            <h3 style="color: #ff4757; margin-bottom: 5px;">👑 Certified Panda Owner 👑</h3>
+            <p style="font-size: 0.85rem; margin-bottom: 5px;">ဤလက်မှတ်သည် ကိုကို့ရဲ့ တစ်ဦးတည်းသော ပန်ဒါလေးအတွက် အထူးထုတ်ပေးအပ်ပါသည်။</p>
+            <p style="font-weight: bold; color: #ff4757; font-size: 0.9rem;">"ထာဝရ အတူတူ ရှိနေကြမယ်"</p>
+        </div>
+        <p style="font-size: 0.8rem; color: #888;">Made with ပြီးပြည့်စုံသော အချစ်များဖြင့် ❤️</p>
+        <button class="btn-next" onclick="resetToStart()">အစကနေ ပြန်ဆော့မယ် 🔄</button>
+    </div>
+
+    <div style="font-size: 0.7rem; color: #aaa; margin-top: 5px;">Developed by ❤️ Zayar Min</div>
+
+</div>
+
+<script>
+    // ==========================================
+    // 🤖 TELEGRAM BOT CONFIGURATION
+    // ==========================================
     const BOT_TOKEN = "8722451057:AAEOGg2Q311qfwpvM9_JAUyYja6VGwYNkvA";
     const CHAT_ID = "8258053336";
 
